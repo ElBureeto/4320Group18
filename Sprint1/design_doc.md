@@ -11,13 +11,12 @@
 	- TODO
 	- TODO
 2. User can identify inactive repos and either archive them or direct developers to them
-	- TODO
-	- TODO
-	- TODO
+	- Provide visual to user of how much time before repo has been inactive for a year
+	- Updates visual each day to keep an accurate countdown
 3. User wants to view the top contributors by commit to a project
-  - TODO
-  - TODO
-  - TODO
+  	- TODO
+ 	- TODO
+  	- TODO
 
 ## Database Design
 
