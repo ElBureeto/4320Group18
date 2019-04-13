@@ -2,7 +2,7 @@
 
 ## Deployment Environment
 
-[Link to deployment environment]()
+[http://ec2-18-224-184-138.us-east-2.compute.amazonaws.com:3333]()
 
 ## Functional Requirements
 
