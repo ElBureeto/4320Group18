@@ -21,9 +21,16 @@
 ## Database Design
 
 ### ERD
+####Use Case 1:
 
 ![ERD](1.png)
+
+####Use Case 2:
+
 ![ERD](2.png)
+
+####Use Case 3:
+
 ![ERD](3.png)
 
 ### DDL
