@@ -7,16 +7,15 @@
 ## Functional Requirements
 
 1. User views data regarding pull requests that are proposed and merged into project
-	- TODO
-	- TODO
-	- TODO
+	- Provide visual of a repo shows how many pull requests are there and how many of them are merged
+	- Update visual every day to keep an accurate countdown.
 2. User can identify inactive repos and either archive them or direct developers to them
 	- Provide visual to user of how much time before repo has been inactive for a year
 	- Updates visual each day to keep an accurate countdown
 3. User wants to view the top contributors by commit to a project
-  	- TODO
- 	- TODO
-  	- TODO
+  	- Provide a list with the username ranked by the number of their commits
+ 	- Show the user with highest commits number as the top contributer of the repo
+  	- Update every day tokeep an accurate countdown
 
 ## Database Design
 
