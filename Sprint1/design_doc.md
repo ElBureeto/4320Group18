@@ -28,10 +28,125 @@
 ### DDL
 
 ```SQL
+# use case 1
 
-    insert DDL stuff here
 
-%% ETC
+
+CREATE TABLE `Contributor` (
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  `user_name` varchar(256) NOT NULL,
+
+  PRIMARY KEY (`id`),
+
+ 
+
+);
+
+
+
+CREATE TABLE `Repo` (
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  PRIMARY KEY (`id`),
+
+);
+
+
+
+CREATE TABLE `Commit`(
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  `repo_id` int(11) NOT NULL,
+
+  `user_name` varchar(256) NOT NULL,
+
+  `no_of_pull` int(11) NOT NULL,
+
+  `pull_data` datetime,
+
+  `no_of_merge` int(11) NOT NULL,
+
+  `merge_data` datetime,
+
+  PRIMARY KEY (`id`),
+
+  FOREIGN KEY ('repo_id') REFERENCES `Repo`(`repo_id`),
+
+  FOREIGN KEY ('user_name') REFERENCES `Contributor`(`user_name`),
+
+);
+
+
+
+
+
+#use case 2
+
+
+
+CREATE TABLE `Repo` (
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  `last_edit_date` datetime
+
+  PRIMARY KEY (`id`),
+
+);
+
+
+
+
+
+# use case 3
+
+
+
+CREATE TABLE `Contributor` (
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  `user_name` varchar(256) NOT NULL,
+
+  PRIMARY KEY (`id`),
+
+ 
+
+);
+
+
+
+CREATE TABLE `Repo` (
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  PRIMARY KEY (`id`),
+
+);
+
+
+
+CREATE TABLE `Commit`(
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  `repo_id` int(11) NOT NULL,
+
+  `user_name` varchar(256) NOT NULL,
+
+  `no_of_commit` int (11) NOT NULL
+
+  PRIMARY KEY (`id`),
+
+  FOREIGN KEY ('repo_id') REFERENCES `Repo`(`repo_id`),
+
+  FOREIGN KEY ('user_name') REFERENCES `Contributor`(`user_name`),
+
+);
 ```
 
 ## Files that are stubbed out in the repository
