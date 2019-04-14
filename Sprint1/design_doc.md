@@ -167,7 +167,7 @@ CREATE TABLE `Commit`(
 
 ### Model Files (Database Access)
 
-I don't really know if we have this one.
+N/A
 
 ### Controller Files (API or other)
 
