@@ -20,6 +20,5 @@
   	- Show the user with highest commits number as the top contributer of the repo
 	- The system should be able to get contributor username and commits from database and communicate with frontend
 	- The system should provides a list of ranked contributors and mark the first place.
-	- The system can provide user different options to choose top contributors by number of commits or number of pull requests
-  	- Update every day tokeep an accurate countdown
+  	- Update every day to keep an accurate countdown
 
