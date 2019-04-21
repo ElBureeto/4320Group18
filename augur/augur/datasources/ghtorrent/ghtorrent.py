@@ -1065,8 +1065,40 @@ class GHTorrent(object):
     4) return a dataframe for each
 
     """
+    @annotate(tag='openness')
+        def openness(self, owner, repo=None):
+            """
+
+            Pull request merged rate of all time
+
+            :param owner: The name of the project owner or the id of the project in the projects table of the project in the projects table.
+            :param repo: The name of the repo. Unneeded if repository id was passed as owner.
+            :return: DataFrame with TOTAL acceptance, TOTAL pull request number and OVERALL rate.            
+            """
+            repoid = self.repoid(owner, repo)
+            pullAcceptanceSQL = s.sql.text("""
+            SELECT SUM(num_approved) AS acceptance, SUM(num_open) AS num_open, SUM(CAST(num_approved AS DECIMAL))/SUM(CAST(num_open AS DECIMAL)) AS "rate"
+            FROM
+                (SELECT COUNT(DISTINCT pull_request_id) AS num_approved, DATE(pull_request_history.created_at) AS accepted_on
+                FROM pull_request_history
+                JOIN pull_requests ON pull_request_history.pull_request_id = pull_requests.id
+                WHERE action = 'merged' AND pull_requests.base_repo_id = :repoid
+                GROUP BY accepted_on) accepted
+            JOIN
+                (SELECT count(distinct pull_request_id) AS num_open, DATE(pull_request_history.created_at) AS date_created
+                FROM pull_request_history
+                JOIN pull_requests ON pull_request_history.pull_request_id = pull_requests.id
+                WHERE action = 'opened'
+                AND pull_requests.base_repo_id = :repoid
+                GROUP BY date_created) opened
+            ON opened.date_created = accepted.accepted_on
+            """)
+            df = pd.read_sql(pullAcceptanceSQL, self.db, params={"repoid": str(repoid)})
+            print(df)
+            return df
 
     """
+
     USE CASE 2: Identifying Inactive Repos
     @annotate(tag='isinactive')
     def openness(self, owner, repo=None):
@@ -1095,3 +1127,60 @@ class GHTorrent(object):
     3) cut the list down to top 10 contributors, getting their user_id and number of commits
     4) return this list of top contributors as a DataFrame
     """
+    @annotate(tag='topcontributors')
+    def topcontributors(self, owner, repo=None):
+        """
+        All the contributors to a project and the counts of their commits
+
+        :param owner: The name of the project owner or the id of the project in the projects table of the project in the projects table. Use repoid() to get this.
+        :param repo: The name of the repo. Unneeded if repository id was passed as owner.
+        :return: DataFrame with user's id and contributions by type, separated by user
+        """
+        repoid = self.repoid(owner, repo)
+        topcontributorsSQL = s.sql.text("""
+            SELECT users.login as name, a.id AS user, SUM(commits) AS commits
+
+            FROM
+            (
+               (SELECT committer_id AS id, COUNT(*) AS commits FROM commits INNER JOIN project_commits ON project_commits.commit_id = commits.id WHERE project_commits.project_id = :repoid GROUP BY commits.committer_id)
+            ) a JOIN users ON users.id = a.id
+            WHERE a.id IS NOT NULL
+            GROUP BY a.id
+            ORDER BY commits DESC;
+        """)
+        return pd.read_sql(topcontributorsSQL, self.db, params={"repoid": str(repoid)})
+
+
+
+
+
+        @annotate(tag='topcontributors_2')
+    def topcontributors_2(self, owner, repo=None):
+        """
+        If that tag('topcontributors') doesn't work, try this
+        """
+        repoid = self.repoid(owner, repo)
+        topcontributors_2SQL = s.sql.text("""
+            SELECT users.login as name, a.id AS user, SUM(commits) AS commits, SUM(issues) AS issues,
+                               SUM(commit_comments) AS commit_comments, SUM(issue_comments) AS issue_comments,
+                               SUM(pull_requests) AS pull_requests, SUM(pull_request_comments) AS pull_request_comments,
+                  SUM(a.commits + a.issues + a.commit_comments + a.issue_comments + a.pull_requests + a.pull_request_comments) AS total
+            FROM
+            (
+               (SELECT committer_id AS id, COUNT(*) AS commits, 0 AS issues, 0 AS commit_comments, 0 AS issue_comments, 0 AS pull_requests, 0 AS pull_request_comments FROM commits INNER JOIN project_commits ON project_commits.commit_id = commits.id WHERE project_commits.project_id = :repoid GROUP BY commits.committer_id)
+               UNION ALL
+               (SELECT reporter_id AS id, 0 AS commits, COUNT(*) AS issues, 0 AS commit_comments, 0 AS issue_comments, 0, 0 FROM issues WHERE issues.repo_id = :repoid GROUP BY issues.reporter_id)
+               UNION ALL
+               (SELECT commit_comments.user_id AS id, 0 AS commits, 0 AS commit_comments, COUNT(*) AS commit_comments, 0 AS issue_comments, 0 , 0 FROM commit_comments JOIN project_commits ON project_commits.commit_id = commit_comments.commit_id WHERE project_commits.project_id = :repoid GROUP BY commit_comments.user_id)
+               UNION ALL
+               (SELECT issue_comments.user_id AS id, 0 AS commits, 0 AS commit_comments, 0 AS issue_comments, COUNT(*) AS issue_comments, 0, 0 FROM issue_comments JOIN issues ON issue_comments.issue_id = issues.id WHERE issues.repo_id = :repoid GROUP BY issue_comments.user_id)
+               UNION ALL
+               (SELECT actor_id AS id, 0, 0, 0, 0, COUNT(*) AS pull_requests, 0 FROM pull_request_history JOIN pull_requests ON pull_requests.id = pull_request_history.id WHERE pull_request_history.action = 'opened' AND pull_requests.`base_repo_id` = :repoid GROUP BY actor_id)
+               UNION ALL
+               (SELECT user_id AS id, 0, 0, 0, 0, 0, COUNT(*) AS pull_request_comments FROM pull_request_comments JOIN pull_requests ON pull_requests.base_commit_id = pull_request_comments.commit_id WHERE pull_requests.base_repo_id = :repoid GROUP BY user_id)
+            ) a JOIN users ON users.id = a.id
+            WHERE a.id IS NOT NULL
+            GROUP BY a.id
+            ORDER BY commits DESC;
+        """)
+        return pd.read_sql(topcontributors_2SQL, self.db, params={"repoid": str(repoid)})
