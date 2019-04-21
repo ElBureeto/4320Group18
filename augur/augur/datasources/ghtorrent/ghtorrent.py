@@ -1112,6 +1112,50 @@ class GHTorrent(object):
     3) return this date to the view
 
     """
+    @annotate(tag='active')
+        def active(self, owner, repo=None):
+            '''
+            Last date of the changes of the repo, judging active stutas by commits,commit_comments, pull_request, pull_request_comments, issues, issue_comments
+            '''
+            repoid = self.repoid(owner, repoid)
+            active2SQL = s.sql.text("""
+            SELECT DATE(created_at) as "last_date"
+            FROM (
+               (SELECT DATE(created_at) AS "created_at" FROM commits JOIN project_commits ON project_commits.commit_id = commit_comments.commit_id WHERE project_commits.project_id = :repoid))
+               UNION ALL
+               (SELECT DATE(created_at) AS "created_at" FROM commit_comments JOIN project_commits ON project_commits.commit_id = commit_comments.commit_id WHERE project_commits.project_id = :repoid)
+               UNION ALL
+               (SELECT DATE(created_at) AS "created_at" FROM pull_request_history JOIN pull_requests ON pull_requests.id = pull_request_history.id WHERE pull_request_history.action = 'opened' AND pull_requests.`base_repo_id` = :repoid)
+               UNION ALL
+               (SELECT DATE(created_at) AS "created_at" FROM pull_request_comments JOIN pull_requests ON pull_requests.base_commit_id = pull_request_comments.commit_id WHERE pull_requests.base_repo_id = :repoid)
+               UNION ALL
+               (SELECT DATE(created_at) AS "created_at" FROM issues WHERE issues.repo_id = :repoid GROUP BY issues.reporter_id)
+               UNION ALL
+               (SELECT DATE(created_at) AS "created_at" FROM issue_comments JOIN issues ON issue_comments.issue_id = issues.id WHERE issues.repo_id = :repoid)
+            )
+            ORDER BY last_date DESC
+                """)
+
+            return pd.read_sql(activeSQL, self.db, params={"repoid": str(repoid)})    
+
+
+
+    @annotate(tag='active2')
+        def active2(self, owner, repo=None):
+            '''
+            Last date of the changes of the repo, judging active stutas
+            (Temporary, only consider the last commit date)
+            '''
+            repoid = self.repoid(owner, repoid)
+            activeSQL = s.sql.text("""
+            SELECT DATE(created_at) as "last_date"
+            FROM commits
+            WHERE commits.project_id = :repoid
+            ORDER BY last_date DESC
+                """)
+
+            return pd.read_sql(activeSQL, self.db, params={"repoid": str(repoid)})
+
 
     """
     USE CASE 3: Identifying Top Contributors By Commit
