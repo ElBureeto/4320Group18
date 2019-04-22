@@ -34,9 +34,9 @@
 
 ## Visual Representation of System
 
-![VRoD](1.png)
+![VRoS](VRoS.png)
 
 ## Visual Representation of Front End
 
-![VRoFE](2.png)
+![VRoFE](VRoFE.png)
 
