@@ -21,4 +21,22 @@
 	- The system should be able to get contributor username and commits from database and communicate with frontend
 	- The system should provides a list of ranked contributors and mark the first place.
   	- Update every day to keep an accurate countdown
+	
+## Necessary for Whole System
+
+1. Data Sources
+	- We need the Augur data tables
+2. Functions
+	- We need SQL functions that send the data from the data tables to the server
+	- We need VJS/Python scripts to interpret the data and put it into helpful graphics
+3. Web Server
+	- We need our EC2 instance to be up and running
+
+## Visual Representation of System
+
+![VRoD](1.png)
+
+## Visual Representation of Front End
+
+![VRoFE](2.png)
 
