@@ -2,7 +2,7 @@
 
 ## Deployment Environment
 
-[do we have a new url](http://ec2-18-224-184-138.us-east-2.compute.amazonaws.com:3333)
+[ec2-18-223-33-215.us-east-2.compute.amazonaws.com:3333](ec2-18-223-33-215.us-east-2.compute.amazonaws.com:3333)
 
 ## Functional Requirements
 
