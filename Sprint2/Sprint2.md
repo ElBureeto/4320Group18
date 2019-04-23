@@ -78,14 +78,7 @@ SELECT SUM(num_approved) AS acceptance, SUM(num_open) AS num_open, SUM(CAST(num_
 
 # use case 2
 
-@annotate(tag='active')
-        def active(self, owner, repo=None):
-            '''
-            Last date of the changes of the repo, judging active stutas by commits,commit_comments, pull_request, pull_request_comments, issues, issue_comments
-            '''
-            repoid = self.repoid(owner, repoid)
-            active2SQL = s.sql.text("""
-            SELECT DATE(created_at) as "last_date"
+SELECT DATE(created_at) as "last_date"
             FROM (
                (SELECT DATE(created_at) AS "created_at" FROM commits JOIN project_commits ON project_commits.commit_id = commit_comments.commit_id WHERE project_commits.project_id = :repoid))
                UNION ALL
