@@ -110,3 +110,10 @@ SELECT users.login as name, a.id AS user, SUM(commits) AS commits
 
 ```
 
+## Backend functions
+1. ghtorrent.py @ line 1068
+2. ghtorrent.py @ line 1115
+3. ghtorrent.py @ line 1174
+
+
+
