@@ -7,31 +7,153 @@
 ## Functional Requirements
 
 1. User views data regarding pull requests that are proposed and merged into project
-	- TODO
-	- TODO
-	- TODO
+	- Provide visual of a repo shows how many pull requests are there and how many of them are merged
+	- Update visual every day to keep an accurate countdown.
 2. User can identify inactive repos and either archive them or direct developers to them
-	- TODO
-	- TODO
-	- TODO
+	- Provide visual to user of how much time before repo has been inactive for a year
+	- Updates visual each day to keep an accurate countdown
 3. User wants to view the top contributors by commit to a project
-  - TODO
-  - TODO
-  - TODO
+  	- Provide a list with the username ranked by the number of their commits
+ 	- Show the user with highest commits number as the top contributer of the repo
+  	- Update every day tokeep an accurate countdown
 
 ## Database Design
 
 ### ERD
+#### Use Case 1:
 
-![ERD]()
+![ERD](1.png)
+
+#### Use Case 2:
+
+![ERD](2.png)
+
+#### Use Case 3:
+
+![ERD](3.png)
 
 ### DDL
 
 ```SQL
+# use case 1
 
-    insert DDL stuff here
 
-%% ETC
+
+CREATE TABLE `Contributor` (
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  `user_name` varchar(256) NOT NULL,
+
+  PRIMARY KEY (`id`),
+
+ 
+
+);
+
+
+
+CREATE TABLE `Repo` (
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  PRIMARY KEY (`id`),
+
+);
+
+
+
+CREATE TABLE `Commit`(
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  `repo_id` int(11) NOT NULL,
+
+  `user_name` varchar(256) NOT NULL,
+
+  `no_of_pull` int(11) NOT NULL,
+
+  `pull_data` datetime,
+
+  `no_of_merge` int(11) NOT NULL,
+
+  `merge_data` datetime,
+
+  PRIMARY KEY (`id`),
+
+  FOREIGN KEY ('repo_id') REFERENCES `Repo`(`repo_id`),
+
+  FOREIGN KEY ('user_name') REFERENCES `Contributor`(`user_name`),
+
+);
+
+
+
+
+
+#use case 2
+
+
+
+CREATE TABLE `Repo` (
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  `last_edit_date` datetime
+
+  PRIMARY KEY (`id`),
+
+);
+
+
+
+
+
+# use case 3
+
+
+
+CREATE TABLE `Contributor` (
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  `user_name` varchar(256) NOT NULL,
+
+  PRIMARY KEY (`id`),
+
+ 
+
+);
+
+
+
+CREATE TABLE `Repo` (
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  PRIMARY KEY (`id`),
+
+);
+
+
+
+CREATE TABLE `Commit`(
+
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+
+  `repo_id` int(11) NOT NULL,
+
+  `user_name` varchar(256) NOT NULL,
+
+  `no_of_commit` int (11) NOT NULL
+
+  PRIMARY KEY (`id`),
+
+  FOREIGN KEY ('repo_id') REFERENCES `Repo`(`repo_id`),
+
+  FOREIGN KEY ('user_name') REFERENCES `Contributor`(`user_name`),
+
+);
 ```
 
 ## Files that are stubbed out in the repository
@@ -45,7 +167,7 @@
 
 ### Model Files (Database Access)
 
-I don't really know if we have this one.
+  N/A
 
 ### Controller Files (API or other)
 

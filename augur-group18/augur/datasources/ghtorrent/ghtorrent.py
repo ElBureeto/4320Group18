@@ -1027,6 +1027,7 @@ class GHTorrent(object):
         return df
 
     """
+
     USE CASE 2: Identifying Inactive Repos
     @annotate(tag='isinactive')
     def openness(self, owner, repo=None):
@@ -1116,9 +1117,6 @@ class GHTorrent(object):
             ORDER BY commits DESC;
         """)
         return pd.read_sql(topcontributorsSQL, self.db, params={"repoid": str(repoid)})
-
-
-
 
 
     @annotate(tag='topcontributors_2')
