@@ -40,3 +40,80 @@
 
 ![VRoFE](VRoFE.png)
 
+## Database Design
+
+### Database Schema
+#### Use Case 1:
+
+![ERD](1.png)
+
+#### Use Case 2:
+
+![ERD](2.png)
+
+#### Use Case 3:
+
+![ERD](3.png)
+
+### DDL
+
+```SQL
+# use case 1
+
+SELECT SUM(num_approved) AS acceptance, SUM(num_open) AS num_open, SUM(CAST(num_approved AS DECIMAL))/SUM(CAST(num_open AS DECIMAL)) AS "rate"
+            FROM
+                (SELECT COUNT(DISTINCT pull_request_id) AS num_approved, DATE(pull_request_history.created_at) AS accepted_on
+                FROM pull_request_history
+                JOIN pull_requests ON pull_request_history.pull_request_id = pull_requests.id
+                WHERE action = 'merged' AND pull_requests.base_repo_id = :repoid
+                GROUP BY accepted_on) accepted
+            JOIN
+                (SELECT count(distinct pull_request_id) AS num_open, DATE(pull_request_history.created_at) AS date_created
+                FROM pull_request_history
+                JOIN pull_requests ON pull_request_history.pull_request_id = pull_requests.id
+                WHERE action = 'opened'
+                AND pull_requests.base_repo_id = :repoid
+                GROUP BY date_created) opened
+            ON opened.date_created = accepted.accepted_on
+
+# use case 2
+
+@annotate(tag='active')
+        def active(self, owner, repo=None):
+            '''
+            Last date of the changes of the repo, judging active stutas by commits,commit_comments, pull_request, pull_request_comments, issues, issue_comments
+            '''
+            repoid = self.repoid(owner, repoid)
+            active2SQL = s.sql.text("""
+            SELECT DATE(created_at) as "last_date"
+            FROM (
+               (SELECT DATE(created_at) AS "created_at" FROM commits JOIN project_commits ON project_commits.commit_id = commit_comments.commit_id WHERE project_commits.project_id = :repoid))
+               UNION ALL
+               (SELECT DATE(created_at) AS "created_at" FROM commit_comments JOIN project_commits ON project_commits.commit_id = commit_comments.commit_id WHERE project_commits.project_id = :repoid)
+               UNION ALL
+               (SELECT DATE(created_at) AS "created_at" FROM pull_request_history JOIN pull_requests ON pull_requests.id = pull_request_history.id WHERE pull_request_history.action = 'opened' AND pull_requests.`base_repo_id` = :repoid)
+               UNION ALL
+               (SELECT DATE(created_at) AS "created_at" FROM pull_request_comments JOIN pull_requests ON pull_requests.base_commit_id = pull_request_comments.commit_id WHERE pull_requests.base_repo_id = :repoid)
+               UNION ALL
+               (SELECT DATE(created_at) AS "created_at" FROM issues WHERE issues.repo_id = :repoid)
+               UNION ALL
+               (SELECT DATE(created_at) AS "created_at" FROM issue_comments JOIN issues ON issue_comments.issue_id = issues.id WHERE issues.repo_id = :repoid)
+            )
+            ORDER BY last_date DESC
+
+# use case 3
+
+SELECT users.login as name, a.id AS user, SUM(commits) AS commits
+
+            FROM
+            (
+               (SELECT committer_id AS id, COUNT(*) AS commits FROM commits INNER JOIN project_commits ON project_commits.commit_id = commits.id WHERE project_commits.project_id = :repoid GROUP BY commits.committer_id)
+            ) a JOIN users ON users.id = a.id
+            WHERE a.id IS NOT NULL
+            GROUP BY a.id
+            ORDER BY commits DESC;
+
+
+
+```
+
